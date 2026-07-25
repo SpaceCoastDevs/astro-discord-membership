@@ -1,0 +1,28 @@
+---
+export const prerender = false;
+
+import MembershipLayout from '../../layouts/MembershipLayout.astro';
+import { getSession } from '../../lib/auth';
+import { communityName, database } from 'astro-discord-membership:config';
+import { getCategoryToneById } from '../../lib/labels';
+
+const user = await getSession(Astro.request);
+if (!user) return Astro.redirect('/api/auth/login');
+if (!user.isGuildOwner) return new Response('Forbidden', { status: 403 });
+const labelCategories = await database.getLabelCategories(true);
+const categoryToneById = getCategoryToneById(labelCategories);
+const labels = await database.getLabels(undefined, true);
+---
+
+<MembershipLayout metadata={{ title: `Manage categories and labels — ${communityName}` }}>
+  <section class="membership-label-admin"><div class="membership-label-admin__container">
+    <div class="membership-label-admin__header"><h1 class="membership-label-admin__title">Manage categories and labels</h1><p class="membership-label-admin__description">Create categories such as Technologies or Personal Interests, then add the labels members can select.</p></div>
+    <form class="membership-label-admin__create-category" data-action="create-category"><input name="name" required maxlength="60" placeholder="New category" class="membership-label-admin__input" /><input name="sortOrder" type="number" min="0" value={labelCategories.length} aria-label="Display order" class="membership-label-admin__order-input" /><button class="membership-label-admin__create-category-button">Add category</button></form>
+    <form method="POST" action="/api/admin/labels/import" enctype="multipart/form-data" class="membership-label-admin__import"><input name="file" type="file" accept=".csv,text/csv" required /><button class="membership-label-admin__import-button">Import CSV</button></form><p class="membership-label-admin__import-help">Columns: <code>category,label,sortOrder</code>. The header row and sortOrder are optional.</p><div class="membership-label-admin__downloads"><a href="/api/admin/labels/template">Download CSV template</a><a href="/api/admin/labels/sample">Download sample CSV</a></div>
+    {labelCategories.map((category) => <section class:list={['membership-label-admin__category', 'membership-label-category', `membership-category--${category.slug}`, `membership-category-tone-${categoryToneById.get(category.id) ?? 0}`]}><div class="membership-label-admin__category-header"><h2 class="membership-label-admin__category-title">{category.name}</h2><button class="membership-label-admin__archive-category" data-action="archive-category" data-id={category.id}>Archive category</button></div><form class="membership-label-admin__order-form" data-action="update-category-order" data-id={category.id}><label>Display order <input name="sortOrder" type="number" min="0" value={category.sortOrder} class="membership-label-admin__order-input" /></label><button class="membership-label-admin__save-order">Save order</button></form><div class="membership-label-admin__labels">{labels.filter((label) => label.categoryId === category.id && label.status !== 'archived').map((label) => <span class:list={['membership-label-pill', 'membership-label-admin__label', `membership-label--${label.slug}`, `membership-label--${category.slug}-${label.slug}`]}>{label.name}<button class="membership-label-admin__archive-label" aria-label={`Archive ${label.name}`} data-action="archive-label" data-id={label.id}>×</button></span>)}</div><form class="membership-label-admin__create-label" data-action="create-label" data-category-id={category.id}><input name="name" required maxlength="60" placeholder={`Add a ${category.name} label`} class="membership-label-admin__input" /><button class="membership-label-admin__create-label-button">Add label</button></form></section>)}
+  </div></section>
+</MembershipLayout>
+<script>
+  document.querySelectorAll<HTMLFormElement>('form[data-action]').forEach((form) => form.addEventListener('submit', async (event) => { event.preventDefault(); const name = form.elements.namedItem('name') as HTMLInputElement | null; const sortOrder = form.elements.namedItem('sortOrder') as HTMLInputElement | null; const result = await fetch('/api/admin/labels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: form.dataset.action, id: form.dataset.id, categoryId: form.dataset.categoryId, name: name?.value, sortOrder: sortOrder?.value }) }); if (result.ok) location.reload(); else alert((await result.json()).error ?? 'Unable to save category.'); }));
+  document.querySelectorAll<HTMLButtonElement>('button[data-id]').forEach((button) => button.addEventListener('click', async () => { if (!confirm('Archive this item?')) return; const result = await fetch('/api/admin/labels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: button.dataset.action, id: button.dataset.id }) }); if (result.ok) location.reload(); else alert((await result.json()).error ?? 'Unable to archive item.'); }));
+</script>

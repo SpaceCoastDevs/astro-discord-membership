@@ -1,0 +1,112 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  discordId: string;
+  discordUsername: string;
+  displayName: string;
+  avatarUrl: string;
+  location?: string;
+  bio?: string;
+  labels?: Array<{
+    name: string;
+    slug: string;
+    categoryName: string;
+    categorySlug: string;
+    categoryTone: number;
+  }>;
+}
+
+const { discordId, discordUsername, displayName, avatarUrl, location, bio = '', labels = [] } = Astro.props;
+const bioPlain = bio.replace(/[*_`~#>[\]]/g, '').trim();
+const searchTerms = [
+  displayName,
+  location,
+  bioPlain,
+  ...labels.flatMap((label) => [label.categoryName, label.name]),
+]
+  .filter(Boolean)
+  .join(' ')
+  .toLowerCase();
+const visibleLabels = [...labels]
+  .sort((a, b) => a.categoryTone - b.categoryTone || a.categoryName.localeCompare(b.categoryName) || a.name.localeCompare(b.name))
+  .slice(0, 5);
+const labelGroups = new Map<string, typeof visibleLabels>();
+for (const label of visibleLabels) {
+  const group = labelGroups.get(label.categorySlug) ?? [];
+  group.push(label);
+  labelGroups.set(label.categorySlug, group);
+}
+---
+
+<a
+  href={`/members/${encodeURIComponent(discordUsername)}`}
+  data-search={searchTerms}
+  class="membership-member-card"
+>
+  <div class="membership-member-card__header">
+    <img
+      src={avatarUrl}
+      alt={displayName}
+      width="48"
+      height="48"
+      class="membership-member-card__avatar"
+      loading="lazy"
+    />
+    <div class="membership-member-card__identity">
+      <p class="membership-member-card__name">
+        {displayName}
+      </p>
+      {
+        location && (
+          <p class="membership-member-card__location">
+            <Icon name="map-pin" class="membership-member-card__location-icon" />
+            <span>{location}</span>
+          </p>
+        )
+      }
+    </div>
+  </div>
+
+  {bioPlain && <p class="membership-member-card__bio">{bioPlain}</p>}
+
+  {
+    labels.length > 0 && (
+      <div class="membership-member-card__labels membership-card-labels">
+        {[...labelGroups.values()].map((group) => (
+          <div
+            class:list={[
+              'membership-card-label-category',
+              'membership-member-card__label-category',
+              'membership-label-category',
+              `membership-category--${group[0].categorySlug}`,
+              `membership-category-tone-${group[0].categoryTone}`,
+            ]}
+          >
+            <p class="membership-member-card__label-category-name membership-card-label-heading">{group[0].categoryName}</p>
+            <div class="membership-member-card__label-list">
+              {group.map((label) => (
+                <span
+                  class:list={[
+                    'membership-label-pill',
+                    'membership-member-card__label',
+                    `membership-label--${label.slug}`,
+                    `membership-label--${label.categorySlug}-${label.slug}`,
+                  ]}
+                >
+                  {label.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+        {labels.length > 5 && (
+          <span class="membership-member-card__label-more membership-label-more">
+            +{labels.length - 5}
+          </span>
+        )}
+      </div>
+    )
+  }
+
+</a>

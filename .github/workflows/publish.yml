@@ -1,0 +1,38 @@
+name: Publish package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir playground install --frozen-lockfile
+      - run: pnpm --dir playground check
+      - run: pnpm --dir playground exec playwright install --with-deps chromium
+      - run: pnpm --dir playground test:e2e
+      - name: Verify release tag matches package version
+        run: test "v$(node -p 'require("./package.json").version')" = "${{ github.event.release.tag_name }}"
+      - run: npm pack --dry-run
+      - name: Publish prerelease to npm
+        if: github.event.release.prerelease
+        run: npm publish --tag next
+      - name: Publish stable release to npm
+        if: ${{ !github.event.release.prerelease }}
+        run: npm publish --tag latest

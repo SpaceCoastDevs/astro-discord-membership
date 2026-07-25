@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+import { database } from 'astro-discord-membership:config';
+
+interface Props {
+  id?: string;
+  isDark?: boolean;
+}
+
+const { id, isDark = false } = Astro.props;
+
+const members = await database.listPublicMemberProfiles();
+
+if (members.length === 0) return;
+
+const member = members[Math.floor(Math.random() * members.length)];
+
+// Plain-text bio excerpt — strip Markdown syntax
+const bioText = member.bio.replace(/[*_`~#>[\]()]/g, '').trim();
+const bioExcerpt = bioText.slice(0, 200) + (bioText.length > 200 ? '…' : '');
+
+const socialLinks = [
+  member.github && { href: `https://github.com/${member.github}`, icon: 'github', label: 'GitHub' },
+  member.linkedin && {
+    href: `https://linkedin.com/in/${member.linkedin}`,
+    icon: 'linkedin',
+    label: 'LinkedIn',
+  },
+  member.bluesky && {
+    href: `https://bsky.app/profile/${member.bluesky}`,
+    icon: 'bluesky',
+    label: 'Bluesky',
+  },
+  member.website && { href: member.website, icon: 'world', label: 'Website' },
+].filter(Boolean) as { href: string; icon: string; label: string }[];
+---
+
+<section class:list={['membership-member-spotlight', { 'membership-member-spotlight--dark': isDark }]} {...id ? { id } : {}}>
+  <div class="membership-member-spotlight__container">
+    <div class="membership-member-spotlight__header">
+      <div>
+        <p class="membership-member-spotlight__eyebrow">Spotlight</p>
+        <h2 class="membership-member-spotlight__title">Member Spotlight</h2>
+      </div>
+      <a href="/members" class="membership-member-spotlight__link">Meet everyone →</a>
+    </div>
+
+    <a
+      href={`/members/${encodeURIComponent(member.discordUsername)}`}
+      class="membership-member-spotlight__card"
+    >
+      <!-- Avatar -->
+      <div class="membership-member-spotlight__avatar-column">
+        <img
+          src={member.avatarUrl}
+          alt={member.displayName}
+          width="96"
+          height="96"
+          class="membership-member-spotlight__avatar"
+        />
+        {
+          socialLinks.length > 0 && (
+            <div class="membership-member-spotlight__social-links">
+              {socialLinks.map((link) => (
+                <span class="membership-member-spotlight__social-link" title={link.label}>
+                  <Icon name={link.icon} class="membership-member-spotlight__social-icon" />
+                </span>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Info -->
+      <div class="membership-member-spotlight__details">
+        <div class="membership-member-spotlight__identity">
+          <h3 class="membership-member-spotlight__name">
+            {member.displayName}
+          </h3>
+          {
+            member.location && (
+              <span class="membership-member-spotlight__location">
+                <Icon name="map-pin" class="membership-member-spotlight__location-icon" />
+                {member.location}
+              </span>
+            )
+          }
+        </div>
+
+        {bioExcerpt && <p class="membership-member-spotlight__bio">{bioExcerpt}</p>}
+
+      </div>
+    </a>
+  </div>
+</section>

@@ -1,0 +1,67 @@
+{
+  "name": "@space-coast-devs/astro-discord-membership",
+  "version": "0.1.0-rc.1",
+  "packageManager": "pnpm@11.5.2",
+  "description": "Astro integration that adds Discord-based community membership — auth, member directory, profiles, and email verification.",
+  "type": "module",
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "astro-component",
+    "discord",
+    "membership",
+    "community"
+  ],
+  "author": "Space Coast Devs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SpaceCoastDevs/astro-discord-membership.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SpaceCoastDevs/astro-discord-membership/issues"
+  },
+  "homepage": "https://github.com/SpaceCoastDevs/astro-discord-membership#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./types": "./types.ts",
+    "./components/*": "./components/*",
+    "./layouts/*": "./layouts/*",
+    "./adapters/firestore": "./adapters/firestore.ts",
+    "./adapters/drizzle": "./adapters/drizzle.ts"
+  },
+  "scripts": {
+    "playground:dev": "npm --prefix playground run dev",
+    "playground:build": "npm --prefix playground run build",
+    "release:check": "pnpm --dir playground check && pnpm --dir playground test:e2e && npm pack --dry-run"
+  },
+  "files": [
+    "index.ts",
+    "types.d.ts",
+    "components/",
+    "layouts/",
+    "adapters/",
+    "lib/",
+    "routes/",
+    "styles/",
+    "types.ts"
+  ],
+  "peerDependencies": {
+    "astro": "^4.0.0",
+    "firebase-admin": "^13.0.0"
+  },
+  "peerDependenciesMeta": {
+    "firebase-admin": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "jose": "^6.0.0",
+    "marked": "^17.0.0",
+    "nodemailer": "^8.0.0",
+    "drizzle-orm": "^0.44.5"
+  }
+}

@@ -1,0 +1,43 @@
+---
+import type { Label, LabelCategory } from '../types';
+
+interface Props {
+  categories: LabelCategory[];
+  labels: Label[];
+  selectedLabelIds?: Iterable<string>;
+}
+
+const { categories, labels, selectedLabelIds = [] } = Astro.props;
+const selected = new Set(selectedLabelIds);
+---
+
+{
+  categories.map((category, categoryTone) => {
+    const categoryLabels = labels.filter((label) => label.categoryId === category.id);
+    if (!categoryLabels.length) return null;
+
+    return (
+      <fieldset class:list={['membership-profile__label-category', `membership-category--${category.slug}`, `membership-category-tone-${categoryTone % 8}`]}>
+        <legend class="membership-profile__legend">{category.name}</legend>
+        {category.description && <p class="membership-profile__label-category-description">{category.description}</p>}
+        <div class="membership-label-options">
+          {categoryLabels.map((label) => (
+            <label
+              class:list={[
+                'membership-label-option',
+                'membership-profile__label-option',
+                `membership-category--${category.slug}`,
+                `membership-category-tone-${categoryTone % 8}`,
+                `membership-label--${label.slug}`,
+                `membership-label--${category.slug}-${label.slug}`,
+              ]}
+            >
+              <input type="checkbox" name="labels" value={label.id} checked={selected.has(label.id)} />
+              <span>{label.name}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    );
+  })
+}

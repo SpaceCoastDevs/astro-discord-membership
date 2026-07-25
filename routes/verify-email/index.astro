@@ -1,0 +1,143 @@
+---
+export const prerender = false;
+
+import MembershipLayout from '../../layouts/MembershipLayout.astro';
+import { getSession, createSession, buildSessionCookies } from '../../lib/auth';
+import { communityName, database } from 'astro-discord-membership:config';
+
+const user = await getSession(Astro.request);
+if (!user) return Astro.redirect('/api/auth/login');
+if (user.emailVerified) return Astro.redirect('/profile');
+
+// JWT may be stale — check Firestore as the source of truth
+const profile = await database.getMemberProfile(user.discordId);
+if (profile?.emailVerified === true) {
+  const updatedUser = { ...user, emailVerified: true };
+  const token = await createSession(updatedUser);
+  const cookies = buildSessionCookies(token, updatedUser);
+  const headers = new Headers({ Location: '/profile' });
+  cookies.forEach((c) => headers.append('Set-Cookie', c));
+  return new Response(null, { status: 302, headers });
+}
+---
+
+<MembershipLayout
+  metadata={{
+    title: `Verify Your Email — ${communityName}`,
+    description: `Verify your email to activate your ${communityName} membership.`,
+  }}
+>
+  <section class="membership-verify-email membership-verify-email--request">
+    <div class="membership-verify-email__container">
+      <div class="membership-verify-email__card">
+        <div class="membership-verify-email__header">
+          <div class="membership-verify-email__icon">
+            <svg
+              width="28"
+              height="28"
+              class="membership-verify-email__icon-svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              ></path>
+            </svg>
+          </div>
+          <h1 class="membership-verify-email__title">Verify your email</h1>
+          <p class="membership-verify-email__description">
+            Enter your email address and we'll send you a 6-digit verification code.
+          </p>
+        </div>
+
+        <div
+          id="error-msg"
+          class="membership-verify-email__error is-hidden"
+        >
+        </div>
+
+        <div class="membership-verify-email__form">
+          <div class="membership-verify-email__field">
+            <label for="email" class="membership-verify-email__label">
+              Email address
+            </label>
+            <input
+              id="email"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              class="membership-verify-email__input"
+            />
+          </div>
+
+          <button
+            id="send-btn"
+            type="button"
+            class="membership-verify-email__submit"
+          >
+            Send verification code
+          </button>
+        </div>
+
+        <p class="membership-verify-email__footer">
+          Signed in as <strong>{user.displayName}</strong> via Discord.
+          <a href="/api/auth/logout">Sign out</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</MembershipLayout>
+
+<script>
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
+  const errorMsg = document.getElementById('error-msg') as HTMLDivElement;
+
+  function showError(msg: string) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.remove('is-hidden');
+  }
+
+  sendBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      showError('Please enter your email address.');
+      return;
+    }
+
+    errorMsg.classList.add('is-hidden');
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+
+      if (!res.ok) {
+        showError(data.error ?? 'Something went wrong. Please try again.');
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send verification code';
+        return;
+      }
+
+      window.location.href = '/verify-email/check';
+    } catch {
+      showError('Network error. Please try again.');
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send verification code';
+    }
+  });
+
+  emailInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendBtn.click();
+  });
+</script>

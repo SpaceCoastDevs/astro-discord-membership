@@ -1,0 +1,80 @@
+---
+export const prerender = false;
+
+import MembershipLayout from '../../layouts/MembershipLayout.astro';
+import PublicMemberProfile from '../../components/PublicMemberProfile.astro';
+import { marked } from 'marked';
+import { communityName, database } from 'astro-discord-membership:config';
+import { getCategoryToneById } from '../../lib/labels';
+
+const { username } = Astro.params;
+
+if (!username) {
+  return Astro.redirect('/members');
+}
+
+const member = await database.getMemberProfileByDiscordUsername(username);
+
+if (!member) {
+  return new Response(null, { status: 404 });
+}
+
+if (!member.isPublic) {
+  return new Response(null, { status: 404 });
+}
+
+const labelCategories = await database.getLabelCategories(true);
+const labelCategoriesById = new Map(labelCategories.map((category) => [category.id, category]));
+const categoryToneById = getCategoryToneById(labelCategories);
+const labelsById = new Map((await database.getLabels(undefined, true)).map((label) => [label.id, label]));
+const memberLabelGroups = new Map<string, {
+  id: string;
+  name: string;
+  slug: string;
+  sortOrder: number;
+  labels: Array<{ name: string; slug: string }>;
+}>();
+for (const labelId of await database.getMemberLabelIds(member.discordId)) {
+  const label = labelsById.get(labelId);
+  const category = label && labelCategoriesById.get(label.categoryId);
+  if (!label || !category || label.status === 'archived') continue;
+  const group = memberLabelGroups.get(label.categoryId) ?? {
+    id: category.id,
+    name: category.name,
+    slug: category.slug,
+    sortOrder: category.sortOrder,
+    labels: [],
+  };
+  group.labels.push({ name: label.name, slug: label.slug });
+  memberLabelGroups.set(label.categoryId, group);
+}
+const memberLabelSets = [...memberLabelGroups.values()].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+
+function parseBio(text: string): string {
+  // Escape angle brackets before parsing to prevent raw HTML injection
+  const sanitized = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const html = marked.parse(sanitized, { gfm: true, breaks: true }) as string;
+  // Open all links in a new tab and strip any javascript: hrefs
+  return html
+    .replace(/<a\s/g, '<a target="_blank" rel="noopener noreferrer" ')
+    .replace(/href="javascript:[^"]*"/gi, 'href="#"');
+}
+
+const bioHtml = member.bio ? parseBio(member.bio) : '';
+// Plain text bio for meta description (strip Markdown syntax)
+const bioPlain = member.bio.replace(/[*_`~#>[\]]/g, '').trim();
+
+---
+
+<MembershipLayout
+  metadata={{
+    title: `${member.displayName} — ${communityName}`,
+    description: bioPlain || `${member.displayName} is a member of ${communityName}.`,
+  }}
+>
+  <PublicMemberProfile
+    member={member}
+    bioHtml={bioHtml}
+    labelGroups={memberLabelSets.map((group) => ({ ...group, tone: categoryToneById.get(group.id) ?? 0 }))}
+  />
+</MembershipLayout>

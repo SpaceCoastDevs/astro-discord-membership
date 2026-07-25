@@ -1,0 +1,147 @@
+---
+export const prerender = false;
+
+import MembershipLayout from '../../layouts/MembershipLayout.astro';
+import { getSession, createSession, buildSessionCookies } from '../../lib/auth';
+import { communityName, database } from 'astro-discord-membership:config';
+
+const user = await getSession(Astro.request);
+if (!user) return Astro.redirect('/api/auth/login');
+if (user.emailVerified) return Astro.redirect('/profile');
+
+const profile = await database.getMemberProfile(user.discordId);
+if (profile?.emailVerified === true) {
+  const updatedUser = { ...user, emailVerified: true };
+  const token = await createSession(updatedUser);
+  const cookies = buildSessionCookies(token, updatedUser);
+  const headers = new Headers({ Location: '/profile' });
+  cookies.forEach((c) => headers.append('Set-Cookie', c));
+  return new Response(null, { status: 302, headers });
+}
+---
+
+<MembershipLayout
+  metadata={{
+    title: `Enter Verification Code — ${communityName}`,
+    description: 'Enter the code sent to your email to activate your membership.',
+  }}
+>
+  <section class="membership-verify-email membership-verify-email--check">
+    <div class="membership-verify-email__container">
+      <div class="membership-verify-email__card">
+        <div class="membership-verify-email__header">
+          <div class="membership-verify-email__icon">
+            <svg
+              width="28"
+              height="28"
+              class="membership-verify-email__icon-svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h1 class="membership-verify-email__title">Check your inbox</h1>
+          <p class="membership-verify-email__description">
+            We sent a 6-digit code to your email. Enter it below — it expires in 15 minutes.
+          </p>
+        </div>
+
+        <div
+          id="error-msg"
+          class="membership-verify-email__error is-hidden"
+        >
+        </div>
+
+        <div class="membership-verify-email__form">
+          <div class="membership-verify-email__field">
+            <label for="code" class="membership-verify-email__label">
+              Verification code
+            </label>
+            <input
+              id="code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              placeholder="123456"
+              class="membership-verify-email__input membership-verify-email__input--code"
+            />
+          </div>
+
+          <button
+            id="verify-btn"
+            type="button"
+            class="membership-verify-email__submit"
+          >
+            Verify and activate
+          </button>
+        </div>
+
+        <p class="membership-verify-email__footer">
+          Didn't get the code?
+          <a href="/verify-email">Send a new one</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</MembershipLayout>
+
+<script>
+  const codeInput = document.getElementById('code') as HTMLInputElement;
+  const verifyBtn = document.getElementById('verify-btn') as HTMLButtonElement;
+  const errorMsg = document.getElementById('error-msg') as HTMLDivElement;
+
+  // Auto-submit when 6 digits are entered
+  codeInput.addEventListener('input', () => {
+    codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+    if (codeInput.value.length === 6) verifyBtn.click();
+  });
+
+  function showError(msg: string) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.remove('is-hidden');
+  }
+
+  verifyBtn.addEventListener('click', async () => {
+    const code = codeInput.value.trim();
+    if (code.length !== 6) {
+      showError('Please enter the 6-digit code from your email.');
+      return;
+    }
+
+    errorMsg.classList.add('is-hidden');
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = 'Verifying…';
+
+    try {
+      const res = await fetch('/api/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+
+      if (!res.ok) {
+        showError(data.error ?? 'Something went wrong. Please try again.');
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify and activate';
+        codeInput.value = '';
+        codeInput.focus();
+        return;
+      }
+
+      window.location.href = '/profile';
+    } catch {
+      showError('Network error. Please try again.');
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify and activate';
+    }
+  });
+</script>

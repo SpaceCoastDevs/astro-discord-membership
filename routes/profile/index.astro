@@ -1,0 +1,88 @@
+---
+export const prerender = false;
+
+import MembershipLayout from '../../layouts/MembershipLayout.astro';
+import ProfileForm from '../../components/ProfileForm.astro';
+import { getSession, createSession, buildSessionCookies } from '../../lib/auth';
+import { communityName, database } from 'astro-discord-membership:config';
+import '../../styles/membership.css';
+
+const user = await getSession(Astro.request);
+if (!user) {
+  return Astro.redirect('/api/auth/login');
+}
+
+// Read the adapter first — use it as the source of truth for emailVerified
+const profile = await database.getMemberProfile(user.discordId);
+
+if (!profile?.emailVerified) {
+  return Astro.redirect('/verify-email');
+}
+
+// Heal a stale JWT if the cookie pre-dates email verification
+if (!user.emailVerified) {
+  const updatedUser = { ...user, emailVerified: true };
+  const token = await createSession(updatedUser);
+  const cookies = buildSessionCookies(token, updatedUser);
+  cookies.forEach((c) => Astro.response.headers.append('Set-Cookie', c));
+}
+
+const status = Astro.url.searchParams.get('status');
+const labelCategories = await database.getLabelCategories();
+const labels = await database.getLabels();
+const selectedLabelIds = new Set(await database.getMemberLabelIds(user.discordId));
+
+---
+
+<MembershipLayout metadata={{ title: `My Profile — ${communityName}` }}>
+  <section class="membership-profile">
+    <div class="membership-profile__container">
+      <div class="membership-profile__header">
+        <h1 class="membership-profile__title">My Profile</h1>
+        <p class="membership-profile__description">
+          This is how you appear in the <a href="/members" class="membership-profile__directory-link">member directory</a>.
+        </p>
+      </div>
+
+      {
+        status === 'saved' && (
+          <div class="membership-profile__status">
+            Profile saved successfully!
+          </div>
+        )
+      }
+
+      <div class="membership-profile__identity">
+        <img
+          src={profile.avatarUrl}
+          alt={profile.displayName}
+          width="64"
+          height="64"
+          class="membership-profile__avatar"
+        />
+        <div class="membership-profile__identity-details">
+          <p class="membership-profile__identity-name">{profile.displayName}</p>
+          <p class="membership-profile__identity-meta">
+            @{profile.discordUsername} · Avatar synced from Discord
+          </p>
+        </div>
+      </div>
+
+      <ProfileForm
+        profile={profile}
+        categories={labelCategories}
+        labels={labels}
+        selectedLabelIds={selectedLabelIds}
+      />
+
+      <div class="membership-profile__footer">
+        <a
+          href="/api/auth/logout"
+          class="membership-profile__sign-out"
+        >
+          Sign out
+        </a>
+      </div>
+    </div>
+  </section>
+</MembershipLayout>

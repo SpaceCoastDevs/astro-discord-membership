@@ -1,0 +1,36 @@
+---
+import AuthButton from '#membership/components/AuthButton.astro';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="A local Astro app that exercises the membership integration." />
+    <title>astro-discord-membership playground</title>
+  </head>
+  <body>
+    <main class="playground">
+      <p class="eyebrow">Integration fixture</p>
+      <h1>astro-discord-membership playground</h1>
+      <p class="intro">
+      This minimal host app loads the local integration through <code>file:..</code> and exposes its Discord sign-in flow.
+      </p>
+
+      <div class="actions">
+        <AuthButton />
+        <a href="/members">Open member directory →</a>
+      </div>
+
+      <div class="notice">
+        <strong>Before testing protected routes</strong>
+        <p>
+          Copy <code>.env.example</code> to <code>.env</code> and provide Discord, Firebase, session, and SMTP credentials.
+          The home page itself does not require credentials; the directory and profile routes do.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

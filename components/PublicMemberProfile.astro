@@ -1,0 +1,56 @@
+---
+import Icon from './Icon.astro';
+import type { MemberProfile } from '../types';
+
+export interface MemberLabelGroup {
+  id: string;
+  name: string;
+  slug: string;
+  tone?: number;
+  labels: Array<{ name: string; slug: string }>;
+}
+
+interface Props {
+  member: MemberProfile;
+  bioHtml?: string;
+  labelGroups?: MemberLabelGroup[];
+  directoryHref?: string;
+}
+
+const { member, bioHtml = '', labelGroups = [], directoryHref = '/members' } = Astro.props;
+const socialLinks = [
+  { label: 'Website', icon: 'world', href: member.website },
+  { label: 'GitHub', icon: 'github', href: member.github ? `https://github.com/${member.github.replace(/^@/, '')}` : '' },
+  { label: 'LinkedIn', icon: 'linkedin', href: member.linkedin ? `https://linkedin.com/in/${member.linkedin.replace(/^.*linkedin\.com\/in\//, '')}` : '' },
+  { label: 'Bluesky', icon: 'bluesky', href: member.bluesky ? `https://bsky.app/profile/${member.bluesky.replace(/^@/, '')}` : '' },
+].filter((link) => link.href);
+---
+
+<section class="membership-member-profile">
+  <div class="membership-member-profile__container">
+    <a href={directoryHref} class="membership-member-profile__back"><Icon name="arrow-left" class="membership-member-profile__back-icon" /> Back to directory</a>
+
+    <div class="membership-member-profile__identity">
+      <img src={member.avatarUrl} alt={member.displayName} width="96" height="96" class="membership-member-profile__avatar" />
+      <div class="membership-member-profile__details">
+        <h1 class="membership-member-profile__name">{member.displayName}</h1>
+        <p class="membership-member-profile__username">@{member.discordUsername}</p>
+        {member.location && <p class="membership-member-profile__location"><Icon name="map-pin" class="membership-member-profile__location-icon" /> {member.location}</p>}
+        {socialLinks.length > 0 && <div class="membership-member-profile__social-links">
+          {socialLinks.map((link) => <a href={link.href} target="_blank" rel="noopener noreferrer" class="membership-member-profile__social-link" aria-label={link.label}><Icon name={link.icon} class="membership-member-profile__social-link-icon" /><span>{link.label}</span></a>)}
+        </div>}
+      </div>
+    </div>
+
+    {bioHtml && <div class="membership-member-profile__bio"><h2 class="membership-member-profile__bio-title">About</h2><div class="membership-member-profile__bio-content" set:html={bioHtml} /></div>}
+
+    {labelGroups.map((group, tone) => (
+      <div class:list={['membership-label-category', 'membership-member-profile__label-category', `membership-category--${group.slug}`, `membership-category-tone-${group.tone ?? tone % 8}`]}>
+        <h2 class="membership-member-profile__label-category-title">{group.name}</h2>
+        <div class="membership-member-profile__label-list">
+          {group.labels.map((label) => <span class:list={['membership-label-pill', 'membership-member-profile__label', `membership-label--${label.slug}`, `membership-label--${group.slug}-${label.slug}`]}>{label.name}</span>)}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

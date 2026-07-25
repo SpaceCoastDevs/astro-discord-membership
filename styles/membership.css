@@ -1,0 +1,371 @@
+/*
+ * Membership plugin styles. They are imported by the package-owned layout so
+ * injected pages render without a host CSS framework.
+ */
+
+:root {
+  color: #1e293b;
+  background: #f8fafc;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+body { margin: 0; }
+main { min-height: 100vh; }
+main h1, main h2, main h3 { color: #0f172a; }
+main a { color: #2563eb; }
+main input, main textarea, main button { font: inherit; }
+main input, main textarea { box-sizing: border-box; max-width: 100%; padding: 0.65rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; }
+main button { padding: 0.65rem 1rem; border: 0; border-radius: 0.5rem; cursor: pointer; }
+.membership-label-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .6rem; }
+.membership-label-option { display: flex !important; align-items: center; gap: .6rem; min-height: 2.75rem; margin: 0 !important; padding: .65rem .75rem; border: 1px solid #cbd5e1; border-radius: .5rem; cursor: pointer; color: #334155; background: #fff; font-weight: 500 !important; }
+.membership-label-option:hover { border-color: #2563eb; background: #eff6ff; }
+.membership-label-option input { width: 1rem; height: 1rem; accent-color: #2563eb; }
+.membership-label-option:has(input:checked) { border-color: #2563eb; background: #dbeafe; color: #1d4ed8; }
+
+/* Label colors are assigned by category display order. The predictable classes
+   make it easy for a host site to override one category or one label, e.g.
+   .membership-category--interests or .membership-label--photography. */
+.membership-label-pill { display: inline-flex; align-items: center; padding: .25rem .75rem; border: 1px solid transparent; border-radius: 9999px; font-size: .875rem; line-height: 1.25rem; font-weight: 500; }
+.membership-label-more { display: inline-flex; align-items: center; padding: .25rem .5rem; border-radius: 9999px; background: #e2e8f0; color: #475569; font-size: .75rem; line-height: 1rem; }
+.membership-card-labels { display: grid; gap: .75rem; }
+.membership-card-label-category { padding-top: .75rem; border-top: 1px solid #e2e8f0; }
+.membership-card-label-category:first-child { padding-top: 0; border-top: 0; }
+.membership-card-label-heading { margin: 0 0 .35rem; color: #475569; font-size: .75rem; font-weight: 700; line-height: 1rem; letter-spacing: .025em; text-transform: uppercase; }
+.membership-category-tone-0 .membership-label-pill, .membership-label-pill.membership-category-tone-0 { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+.membership-category-tone-1 .membership-label-pill, .membership-label-pill.membership-category-tone-1 { background: #dcfce7; border-color: #86efac; color: #15803d; }
+.membership-category-tone-2 .membership-label-pill, .membership-label-pill.membership-category-tone-2 { background: #f3e8ff; border-color: #d8b4fe; color: #7e22ce; }
+.membership-category-tone-3 .membership-label-pill, .membership-label-pill.membership-category-tone-3 { background: #ffedd5; border-color: #fdba74; color: #c2410c; }
+.membership-category-tone-4 .membership-label-pill, .membership-label-pill.membership-category-tone-4 { background: #ffe4e6; border-color: #fda4af; color: #be123c; }
+.membership-category-tone-5 .membership-label-pill, .membership-label-pill.membership-category-tone-5 { background: #cffafe; border-color: #67e8f9; color: #0e7490; }
+.membership-category-tone-6 .membership-label-pill, .membership-label-pill.membership-category-tone-6 { background: #fef9c3; border-color: #fde047; color: #a16207; }
+.membership-label-option.membership-category-tone-0:has(input:checked) { border-color: #60a5fa; background: #dbeafe; color: #1d4ed8; }
+.membership-label-option.membership-category-tone-1:has(input:checked) { border-color: #4ade80; background: #dcfce7; color: #15803d; }
+.membership-label-option.membership-category-tone-2:has(input:checked) { border-color: #c084fc; background: #f3e8ff; color: #7e22ce; }
+.membership-label-option.membership-category-tone-3:has(input:checked) { border-color: #fb923c; background: #ffedd5; color: #c2410c; }
+.membership-label-option.membership-category-tone-4:has(input:checked) { border-color: #fb7185; background: #ffe4e6; color: #be123c; }
+.membership-label-option.membership-category-tone-5:has(input:checked) { border-color: #22d3ee; background: #cffafe; color: #0e7490; }
+.membership-label-option.membership-category-tone-6:has(input:checked) { border-color: #facc15; background: #fef9c3; color: #a16207; }
+
+@media (prefers-color-scheme: dark) {
+  :root { color: #e2e8f0; background: #0f172a; }
+  main h1, main h2, main h3 { color: #f8fafc; }
+  main fieldset { border-color: #334155; }
+  main input[type='text'], main input[type='search'], main textarea { background: #fff; color: #0f172a; border-color: #94a3b8; }
+  .membership-label-option { border-color: #475569; }
+  .membership-label-more { background: #334155; color: #cbd5e1; }
+  .membership-card-label-category { border-color: #334155; }
+  .membership-card-label-heading { color: #94a3b8; }
+  .membership-category-tone-0 .membership-label-pill, .membership-label-pill.membership-category-tone-0 { background: #172554; border-color: #1d4ed8; color: #bfdbfe; }
+  .membership-category-tone-1 .membership-label-pill, .membership-label-pill.membership-category-tone-1 { background: #052e16; border-color: #15803d; color: #bbf7d0; }
+  .membership-category-tone-2 .membership-label-pill, .membership-label-pill.membership-category-tone-2 { background: #3b0764; border-color: #7e22ce; color: #e9d5ff; }
+  .membership-category-tone-3 .membership-label-pill, .membership-label-pill.membership-category-tone-3 { background: #431407; border-color: #c2410c; color: #fed7aa; }
+  .membership-category-tone-4 .membership-label-pill, .membership-label-pill.membership-category-tone-4 { background: #4c0519; border-color: #be123c; color: #fecdd3; }
+  .membership-category-tone-5 .membership-label-pill, .membership-label-pill.membership-category-tone-5 { background: #083344; border-color: #0e7490; color: #a5f3fc; }
+  .membership-category-tone-6 .membership-label-pill, .membership-label-pill.membership-category-tone-6 { background: #422006; border-color: #a16207; color: #fef08a; }
+}
+
+/* Directory and member cards */
+.membership-directory,
+.membership-member-profile,
+.membership-profile,
+.membership-label-admin,
+.membership-verify-email {
+  padding: 3rem 1.25rem;
+}
+.membership-directory__container { width: min(100%, 80rem); max-width: 80rem; margin: 0 auto; }
+.membership-directory__header { margin-bottom: 2.5rem; text-align: center; }
+.membership-directory__title { margin: 0 0 .75rem; color: #0f172a; font-size: 2.25rem; line-height: 1.15; font-weight: 700; }
+.membership-directory__description { width: min(100%, 36rem); margin: 0 auto; color: #64748b; font-size: 1.125rem; }
+.membership-directory__notice { width: min(100%, 42rem); margin: 0 auto 2rem; padding: 1rem 1.25rem; border: 1px solid #fde68a; border-radius: .5rem; background: #fffbeb; color: #92400e; font-size: .875rem; }
+.membership-directory__notice a { margin-left: .5rem; font-weight: 500; text-decoration: underline; }
+.membership-directory__search { width: min(100%, 24rem); margin: 0 auto 2rem; }
+.membership-directory__search-input { width: 100%; padding: .625rem 1rem; border: 1px solid #e2e8f0; border-radius: .5rem; background: #fff; color: #0f172a; font-size: .875rem; }
+.membership-directory__search-input:focus { outline: 2px solid #2563eb; outline-offset: 2px; }
+.membership-directory__grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+.membership-directory__empty { padding: 4rem 0; color: #64748b; text-align: center; }
+.membership-directory__empty a,
+.membership-directory__sign-in-link { color: #2563eb; text-decoration: underline; }
+.membership-directory__sign-in { margin-top: 3rem; color: #94a3b8; font-size: .875rem; text-align: center; }
+
+.membership-member-card { display: flex; flex-direction: column; gap: .75rem; padding: 1.25rem; border: 1px solid #e2e8f0; border-radius: .75rem; background: #fff; color: #334155; text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+.membership-member-card:hover { border-color: #2563eb; box-shadow: 0 10px 15px -3px rgb(15 23 42 / .1); }
+.membership-member-card__header { display: flex; align-items: center; gap: .75rem; }
+.membership-member-card__avatar { flex: 0 0 auto; width: 3rem; height: 3rem; border: 2px solid #f1f5f9; border-radius: 999px; object-fit: cover; }
+.membership-member-card__identity { min-width: 0; }
+.membership-member-card__name { overflow: hidden; margin: 0; color: #0f172a; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.membership-member-card:hover .membership-member-card__name { color: #2563eb; }
+.membership-member-card__location { display: flex; align-items: center; gap: .25rem; margin: 0; color: #64748b; font-size: .875rem; }
+.membership-member-card__location-icon { flex: 0 0 auto; width: .875rem; height: .875rem; }
+.membership-member-card__bio { display: -webkit-box; overflow: hidden; margin: 0; color: #475569; font-size: .875rem; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.membership-member-card__label-list,
+.membership-member-profile__label-list { display: flex; flex-wrap: wrap; gap: .375rem; }
+
+/* Public profile */
+.membership-member-profile__container { width: min(100%, 48rem); max-width: 48rem; margin: 0 auto; }
+.membership-member-profile__back { display: inline-flex; align-items: center; gap: .375rem; margin-bottom: 2rem; color: #64748b; font-size: .875rem; text-decoration: none; }
+.membership-member-profile__back:hover,
+.membership-member-profile__social-link:hover { color: #2563eb; }
+.membership-member-profile__back-icon { width: 1rem; height: 1rem; }
+.membership-member-profile__identity { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+.membership-member-profile__avatar { flex: 0 0 auto; width: 6rem; height: 6rem; border: 4px solid #f1f5f9; border-radius: 1rem; object-fit: cover; }
+.membership-member-profile__details { min-width: 0; }
+.membership-member-profile__name { margin: 0; color: #0f172a; font-size: 1.875rem; line-height: 1.2; font-weight: 700; }
+.membership-member-profile__username { margin: .125rem 0 0; color: #64748b; font-size: .875rem; }
+.membership-member-profile__location { display: flex; align-items: center; gap: .375rem; margin: .5rem 0 0; color: #64748b; font-size: .875rem; }
+.membership-member-profile__location-icon { flex: 0 0 auto; width: 1rem; height: 1rem; }
+.membership-member-profile__social-links { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+.membership-member-profile__social-link { display: inline-flex; align-items: center; gap: .375rem; color: #475569; font-size: .875rem; text-decoration: none; transition: color .15s; }
+.membership-member-profile__social-link-icon { width: 1.25rem; height: 1.25rem; }
+.membership-member-profile__bio { margin-top: 2rem; }
+.membership-member-profile__bio-title,
+.membership-member-profile__label-category-title { margin: 0 0 .5rem; color: #0f172a; font-size: 1.125rem; font-weight: 600; }
+.membership-member-profile__bio-content { color: #475569; font-size: .875rem; line-height: 1.6; }
+.membership-member-profile__bio-content :is(p, ul, ol, blockquote, pre) { margin: 0 0 1rem; }
+.membership-member-profile__bio-content a { color: #2563eb; text-decoration: underline; }
+.membership-member-profile__label-category { margin-top: 2rem; }
+
+@media (min-width: 640px) {
+  .membership-directory__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .membership-member-profile__identity { flex-direction: row; }
+}
+@media (min-width: 1024px) { .membership-directory__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .membership-directory__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+@media (prefers-color-scheme: dark) {
+  .membership-directory__title,
+  .membership-member-card__name,
+  .membership-member-profile__name,
+  .membership-member-profile__bio-title,
+  .membership-member-profile__label-category-title { color: #f8fafc; }
+  .membership-directory__description,
+  .membership-member-card__location,
+  .membership-member-profile__username,
+  .membership-member-profile__location { color: #94a3b8; }
+  .membership-directory__notice { border-color: #854d0e; background: #422006; color: #fde68a; }
+  .membership-directory__search-input { border-color: #334155; background: #0f172a; color: #f8fafc; }
+  .membership-member-card { border-color: #334155; background: #0f172a; color: #e2e8f0; }
+  .membership-member-card__avatar { border-color: #334155; }
+  .membership-member-card__bio,
+  .membership-member-profile__social-link,
+  .membership-member-profile__bio-content { color: #cbd5e1; }
+  .membership-member-profile__avatar { border-color: #1e293b; }
+}
+
+/* Profile editor */
+.membership-profile__container { width: min(100%, 42rem); max-width: 42rem; margin: 0 auto; }
+.membership-profile__header { margin-bottom: 2rem; }
+.membership-profile__title { margin: 0; color: #0f172a; font-size: 1.875rem; line-height: 1.2; font-weight: 700; }
+.membership-profile__description { margin: .375rem 0 0; color: #64748b; font-size: .875rem; }
+.membership-profile__directory-link { color: #2563eb; text-decoration: underline; }
+.membership-profile__status { margin-bottom: 1.5rem; padding: .75rem 1rem; border: 1px solid #86efac; border-radius: .5rem; background: #f0fdf4; color: #166534; font-size: .875rem; }
+.membership-profile__identity { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; border-radius: .75rem; background: #f8fafc; }
+.membership-profile__avatar { width: 4rem; height: 4rem; border-radius: 999px; object-fit: cover; }
+.membership-profile__identity-name { margin: 0; color: #0f172a; font-weight: 600; }
+.membership-profile__identity-meta { margin: .125rem 0 0; color: #64748b; font-size: .875rem; }
+.membership-profile__form { display: grid; gap: 1.5rem; }
+.membership-profile__field { min-width: 0; }
+.membership-profile__label,
+.membership-profile__legend { display: block; margin-bottom: .25rem; color: #334155; font-size: .875rem; font-weight: 500; }
+.membership-profile__hint { margin-left: .25rem; color: #94a3b8; font-weight: 400; }
+.membership-profile__input,
+.membership-profile__textarea { width: 100%; padding: .625rem 1rem; border: 1px solid #e2e8f0; border-radius: .5rem; background: #fff; color: #0f172a; font-size: .875rem; }
+.membership-profile__textarea { min-height: 9rem; resize: vertical; }
+.membership-profile__input:focus,
+.membership-profile__textarea:focus { outline: 2px solid #2563eb; outline-offset: 2px; }
+.membership-profile__social-links,
+.membership-profile__label-category { min-width: 0; margin: 0; padding: 1.25rem; border: 1px solid #e2e8f0; border-radius: .75rem; }
+.membership-profile__social-link-fields { display: grid; gap: .75rem; }
+.membership-profile__social-link-field { display: flex; align-items: center; gap: .75rem; }
+.membership-profile__social-link-field .membership-profile__label { flex: 0 0 9rem; margin: 0; color: #475569; font-weight: 400; }
+.membership-profile__label-category-description { margin: 0 0 .75rem; color: #64748b; font-size: .75rem; }
+.membership-profile__visibility { display: flex; align-items: center; gap: .75rem; }
+.membership-profile__visibility-label { display: flex; align-items: center; gap: .75rem; color: #334155; font-size: .875rem; cursor: pointer; }
+.membership-profile__visibility-input { width: 1rem; height: 1rem; accent-color: #2563eb; }
+.membership-profile__actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: .5rem; }
+.membership-profile__save { padding: .625rem 1.5rem; border: 0; border-radius: .5rem; background: #2563eb; color: #fff; font-size: .875rem; font-weight: 600; cursor: pointer; }
+.membership-profile__save:hover { background: #1d4ed8; }
+.membership-profile__public-link { color: #64748b; font-size: .875rem; text-decoration: none; }
+.membership-profile__public-link:hover { color: #2563eb; }
+.membership-profile__footer { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
+.membership-profile__sign-out { color: #94a3b8; font-size: .875rem; text-decoration: none; }
+.membership-profile__sign-out:hover { color: #ef4444; }
+
+@media (prefers-color-scheme: dark) {
+  .membership-profile__title,
+  .membership-profile__identity-name { color: #f8fafc; }
+  .membership-profile__description,
+  .membership-profile__identity-meta,
+  .membership-profile__label-category-description { color: #94a3b8; }
+  .membership-profile__status { border-color: #166534; background: #052e16; color: #bbf7d0; }
+  .membership-profile__identity { background: #1e293b; }
+  .membership-profile__label,
+  .membership-profile__legend,
+  .membership-profile__visibility-label { color: #cbd5e1; }
+  .membership-profile__input,
+  .membership-profile__textarea { border-color: #334155; background: #0f172a; color: #f8fafc; }
+  .membership-profile__social-links,
+  .membership-profile__label-category,
+  .membership-profile__footer { border-color: #334155; }
+  .membership-profile__social-link-field .membership-profile__label { color: #94a3b8; }
+}
+
+/* Email verification */
+.membership-verify-email__container { width: min(100%, 28rem); max-width: 28rem; margin: 0 auto; }
+.membership-verify-email__card { padding: 2rem; border: 1px solid #f1f5f9; border-radius: 1rem; background: #fff; box-shadow: 0 1px 3px rgb(15 23 42 / .08); }
+.membership-verify-email__header { margin-bottom: 2rem; text-align: center; }
+.membership-verify-email__icon { display: inline-flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; margin-bottom: 1rem; border-radius: 999px; background: #eff6ff; color: #2563eb; }
+.membership-verify-email--check .membership-verify-email__icon { background: #f0fdf4; color: #16a34a; }
+.membership-verify-email__icon-svg { width: 1.75rem; height: 1.75rem; }
+.membership-verify-email__title { margin: 0; color: #0f172a; font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
+.membership-verify-email__description { margin: .5rem 0 0; color: #64748b; font-size: .875rem; }
+.membership-verify-email__error { margin-bottom: 1rem; padding: .75rem 1rem; border: 1px solid #fecaca; border-radius: .5rem; background: #fef2f2; color: #b91c1c; font-size: .875rem; }
+.membership-verify-email__error.is-hidden { display: none; }
+.membership-verify-email__form { display: grid; gap: 1rem; }
+.membership-verify-email__label { display: block; margin-bottom: .25rem; color: #334155; font-size: .875rem; font-weight: 500; }
+.membership-verify-email__input { width: 100%; padding: .625rem 1rem; border: 1px solid #e2e8f0; border-radius: .5rem; background: #fff; color: #0f172a; font-size: .875rem; }
+.membership-verify-email__input:focus { outline: 2px solid #2563eb; outline-offset: 2px; }
+.membership-verify-email--check .membership-verify-email__input:focus { outline-color: #16a34a; }
+.membership-verify-email__input--code { padding-block: .75rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.5rem; letter-spacing: .4em; text-align: center; }
+.membership-verify-email__submit { width: 100%; padding: .625rem 1rem; border: 0; border-radius: .5rem; background: #2563eb; color: #fff; font-size: .875rem; font-weight: 500; cursor: pointer; transition: background .15s; }
+.membership-verify-email__submit:hover { background: #1d4ed8; }
+.membership-verify-email__submit:disabled { opacity: .6; cursor: not-allowed; }
+.membership-verify-email--check .membership-verify-email__submit { background: #16a34a; }
+.membership-verify-email--check .membership-verify-email__submit:hover { background: #15803d; }
+.membership-verify-email__footer { margin: 1.5rem 0 0; color: #94a3b8; font-size: .75rem; text-align: center; }
+.membership-verify-email__footer strong { color: #475569; }
+.membership-verify-email__footer a { margin-left: .25rem; color: inherit; text-decoration: underline; }
+.membership-verify-email__footer a:hover { color: #2563eb; }
+@media (prefers-color-scheme: dark) {
+  .membership-verify-email__card { border-color: #1e293b; background: #0f172a; }
+  .membership-verify-email__icon { background: #172554; color: #60a5fa; }
+  .membership-verify-email--check .membership-verify-email__icon { background: #052e16; color: #4ade80; }
+  .membership-verify-email__title { color: #f8fafc; }
+  .membership-verify-email__description { color: #94a3b8; }
+  .membership-verify-email__error { border-color: #7f1d1d; background: #450a0a; color: #fca5a5; }
+  .membership-verify-email__label { color: #cbd5e1; }
+  .membership-verify-email__input { border-color: #334155; background: #1e293b; color: #f8fafc; }
+  .membership-verify-email__footer strong { color: #cbd5e1; }
+}
+
+/* Authentication button */
+.membership-auth-button { display: flex; align-items: center; }
+.membership-auth-button__placeholder { width: 2rem; height: 2rem; border-radius: 999px; background: #e2e8f0; animation: membership-pulse 1.5s ease-in-out infinite; }
+.membership-auth-button__signed-in,
+.membership-auth-button__profile-link { display: flex; align-items: center; gap: .5rem; }
+.membership-auth-button__profile-link { color: inherit; text-decoration: none; transition: opacity .15s; }
+.membership-auth-button__profile-link:hover { opacity: .8; }
+.membership-auth-button__avatar { width: 2rem; height: 2rem; border: 2px solid #2563eb; border-radius: 999px; object-fit: cover; }
+.membership-auth-button__name { color: #334155; font-size: .875rem; font-weight: 500; }
+.membership-auth-button__sign-out { margin-left: .25rem; color: #64748b; font-size: .75rem; text-decoration: none; }
+.membership-auth-button__sign-out:hover { color: #ef4444; }
+.membership-auth-button__sign-in { display: inline-flex; align-items: center; gap: .375rem; padding: .5rem 1rem; border-radius: .5rem; background: #2563eb; color: #fff; font-size: .875rem; font-weight: 600; text-decoration: none; transition: background .15s; }
+.membership-auth-button__sign-in:hover { background: #1d4ed8; }
+.membership-auth-button__discord-icon { width: 1rem; height: 1rem; fill: currentColor; }
+@keyframes membership-pulse { 50% { opacity: .5; } }
+@media (max-width: 1023px) { .membership-auth-button__name { display: none; } }
+@media (prefers-color-scheme: dark) {
+  .membership-auth-button__placeholder { background: #334155; }
+  .membership-auth-button__name { color: #e2e8f0; }
+  .membership-auth-button__sign-out { color: #94a3b8; }
+}
+
+/* Reusable directory sections */
+.membership-latest-members,
+.membership-member-spotlight { padding: 3rem 1.25rem; }
+.membership-latest-members__container { width: min(100%, 80rem); max-width: 80rem; margin: 0 auto; }
+.membership-member-spotlight__container { width: min(100%, 64rem); max-width: 64rem; margin: 0 auto; }
+.membership-latest-members__header,
+.membership-member-spotlight__header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+.membership-latest-members__eyebrow,
+.membership-member-spotlight__eyebrow { margin: 0 0 .25rem; color: #2563eb; font-size: .875rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.membership-latest-members__title,
+.membership-member-spotlight__title { margin: 0; color: #0f172a; font-size: 1.875rem; line-height: 1.2; font-weight: 700; }
+.membership-latest-members__link,
+.membership-member-spotlight__link { flex: 0 0 auto; color: #2563eb; font-size: .875rem; font-weight: 500; text-decoration: none; }
+.membership-latest-members__link:hover,
+.membership-member-spotlight__link:hover { text-decoration: underline; }
+.membership-latest-members__grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.membership-member-spotlight__card { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 1rem; background: #fff; color: inherit; text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+.membership-member-spotlight__card:hover { border-color: #2563eb; box-shadow: 0 10px 15px -3px rgb(15 23 42 / .1); }
+.membership-member-spotlight__avatar-column { display: flex; flex: 0 0 auto; align-items: center; gap: 1rem; }
+.membership-member-spotlight__avatar { width: 5rem; height: 5rem; border: 4px solid #f1f5f9; border-radius: 999px; object-fit: cover; }
+.membership-member-spotlight__card:hover .membership-member-spotlight__avatar { border-color: rgb(37 99 235 / .3); }
+.membership-member-spotlight__social-links { display: flex; gap: .5rem; }
+.membership-member-spotlight__social-link { color: #94a3b8; transition: color .15s; }
+.membership-member-spotlight__social-link:hover { color: #2563eb; }
+.membership-member-spotlight__social-icon { width: 1rem; height: 1rem; }
+.membership-member-spotlight__details { min-width: 0; }
+.membership-member-spotlight__identity { display: flex; flex-wrap: wrap; align-items: center; column-gap: .75rem; row-gap: .25rem; margin-bottom: .5rem; }
+.membership-member-spotlight__name { margin: 0; color: #0f172a; font-size: 1.25rem; font-weight: 700; transition: color .15s; }
+.membership-member-spotlight__card:hover .membership-member-spotlight__name { color: #2563eb; }
+.membership-member-spotlight__location { display: flex; align-items: center; gap: .25rem; color: #64748b; font-size: .875rem; }
+.membership-member-spotlight__location-icon { width: .875rem; height: .875rem; }
+.membership-member-spotlight__bio { margin: 0 0 1rem; color: #475569; font-size: .875rem; line-height: 1.6; }
+.membership-member-spotlight__skills { display: flex; flex-wrap: wrap; gap: .375rem; }
+.membership-member-spotlight__skill,
+.membership-member-spotlight__skill-more { padding: .125rem .625rem; border-radius: 999px; font-size: .75rem; }
+.membership-member-spotlight__skill { background: #eff6ff; color: #1d4ed8; }
+.membership-member-spotlight__skill-more { background: #f1f5f9; color: #64748b; }
+@media (min-width: 640px) {
+  .membership-latest-members__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .membership-member-spotlight__card { flex-direction: row; }
+  .membership-member-spotlight__avatar-column { flex-direction: column; gap: .75rem; }
+  .membership-member-spotlight__avatar { width: 6rem; height: 6rem; }
+}
+@media (min-width: 1024px) { .membership-latest-members__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (prefers-color-scheme: dark) {
+  .membership-latest-members__title,
+  .membership-member-spotlight__title,
+  .membership-member-spotlight__name { color: #f8fafc; }
+  .membership-member-spotlight__card { border-color: #334155; background: #0f172a; }
+  .membership-member-spotlight__avatar { border-color: #1e293b; }
+  .membership-member-spotlight__location { color: #94a3b8; }
+  .membership-member-spotlight__bio { color: #cbd5e1; }
+  .membership-member-spotlight__skill { background: #172554; color: #93c5fd; }
+  .membership-member-spotlight__skill-more { background: #1e293b; color: #cbd5e1; }
+}
+.membership-latest-members--dark,
+.membership-member-spotlight--dark { background: #0f172a; }
+.membership-latest-members--dark :is(.membership-latest-members__title, .membership-member-spotlight__title),
+.membership-member-spotlight--dark :is(.membership-latest-members__title, .membership-member-spotlight__title) { color: #f8fafc; }
+
+/* Label administration */
+.membership-label-admin__container { width: min(100%, 48rem); max-width: 48rem; margin: 0 auto; display: grid; gap: 2rem; }
+.membership-label-admin__title { margin: 0; color: #0f172a; font-size: 1.875rem; font-weight: 700; }
+.membership-label-admin__description { margin: .5rem 0 0; color: #64748b; }
+.membership-label-admin :is(input, button) { font: inherit; }
+.membership-label-admin__create-category,
+.membership-label-admin__import,
+.membership-label-admin__create-label,
+.membership-label-admin__order-form { display: flex; align-items: center; gap: .75rem; }
+.membership-label-admin__input { flex: 1 1 auto; min-width: 0; padding: .5rem .75rem; border: 1px solid #cbd5e1; border-radius: .5rem; background: #fff; color: #0f172a; font-size: .875rem; }
+.membership-label-admin__order-input { width: 5rem; padding: .5rem; border: 1px solid #94a3b8; border-radius: .375rem; background: #fff; color: #0f172a; }
+.membership-label-admin :is(input:focus, button:focus-visible) { outline: 2px solid #2563eb; outline-offset: 2px; }
+.membership-label-admin :is(button, .membership-label-admin__downloads a) { cursor: pointer; }
+.membership-label-admin :is(.membership-label-admin__create-category-button, .membership-label-admin__create-label-button, .membership-label-admin__import-button, .membership-label-admin__save-order) { padding: .5rem 1rem; border: 0; border-radius: .5rem; background: #2563eb; color: #fff; font-size: .875rem; font-weight: 600; }
+.membership-label-admin__import-button,
+.membership-label-admin__create-label-button,
+.membership-label-admin__save-order { background: #334155; }
+.membership-label-admin__import-help { margin: -1.5rem 0 0; color: #64748b; font-size: .75rem; }
+.membership-label-admin__downloads { display: flex; gap: .75rem; margin-top: -1.5rem; font-size: .875rem; }
+.membership-label-admin__downloads a { color: #2563eb; text-decoration: underline; }
+.membership-label-admin__category { padding: 1.25rem; border: 1px solid #e2e8f0; border-radius: .75rem; }
+.membership-label-admin__category-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.membership-label-admin__category-title { margin: 0; color: #0f172a; font-weight: 600; }
+.membership-label-admin__archive-category,
+.membership-label-admin__archive-label { padding: .25rem .5rem; border: 0; background: transparent; color: #ef4444; font-size: .75rem; }
+.membership-label-admin__order-form { margin-top: .75rem; }
+.membership-label-admin__order-form label { color: #334155; font-size: .875rem; }
+.membership-label-admin__labels { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.membership-label-admin__label { gap: .25rem; }
+.membership-label-admin__create-label { margin-top: 1rem; }
+@media (prefers-color-scheme: dark) {
+  .membership-label-admin__title,
+  .membership-label-admin__category-title { color: #f8fafc; }
+  .membership-label-admin__description,
+  .membership-label-admin__import-help { color: #94a3b8; }
+  .membership-label-admin__input,
+  .membership-label-admin__order-input { border-color: #475569; background: #0f172a; color: #f8fafc; }
+  .membership-label-admin__category { border-color: #334155; }
+  .membership-label-admin__order-form label { color: #cbd5e1; }
+}

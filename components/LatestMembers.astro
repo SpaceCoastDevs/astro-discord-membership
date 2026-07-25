@@ -1,0 +1,73 @@
+---
+import MemberCard from './MemberCard.astro';
+import { database } from 'astro-discord-membership:config';
+import { getCategoryToneById } from '../lib/labels';
+
+interface Props {
+  count?: number;
+  id?: string;
+  isDark?: boolean;
+}
+
+const { count = 6, id, isDark = false } = Astro.props;
+
+const members = await database.listLatestMemberProfiles(count);
+const labelCategories = await database.getLabelCategories();
+const labelCategoriesById = new Map(labelCategories.map((category) => [category.id, category]));
+const categoryToneById = getCategoryToneById(labelCategories);
+const labelsById = new Map((await database.getLabels()).map((label) => [label.id, label]));
+const memberLabels = new Map(
+  await Promise.all(
+    members.map(
+      async (member) =>
+        [
+          member.discordId,
+          (await database.getMemberLabelIds(member.discordId))
+            .map((id) => {
+              const label = labelsById.get(id);
+              const category = label && labelCategoriesById.get(label.categoryId);
+              if (!label || !category) return undefined;
+              return {
+                name: label.name,
+                slug: label.slug,
+                categoryName: category.name,
+                categorySlug: category.slug,
+                categoryTone: categoryToneById.get(category.id) ?? 0,
+              };
+            })
+            .filter((label): label is NonNullable<typeof label> => Boolean(label)),
+        ] as const,
+    ),
+  ),
+);
+
+if (members.length === 0) return;
+---
+
+<section class:list={['membership-latest-members', { 'membership-latest-members--dark': isDark }]} {...id ? { id } : {}}>
+  <div class="membership-latest-members__container">
+    <div class="membership-latest-members__header">
+      <div>
+        <p class="membership-latest-members__eyebrow">Community</p>
+        <h2 class="membership-latest-members__title">Recently Joined</h2>
+      </div>
+      <a href="/members" class="membership-latest-members__link">View all members →</a>
+    </div>
+
+    <div class="membership-latest-members__grid">
+      {
+        members.map((m) => (
+          <MemberCard
+            discordId={m.discordId}
+            discordUsername={m.discordUsername}
+            displayName={m.displayName}
+            avatarUrl={m.avatarUrl}
+            location={m.location}
+            bio={m.bio}
+            labels={memberLabels.get(m.discordId) ?? []}
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>

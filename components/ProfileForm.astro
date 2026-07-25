@@ -1,0 +1,88 @@
+---
+import type { Label, LabelCategory, MemberProfile } from '../types';
+import LabelPicker from './LabelPicker.astro';
+
+interface Props {
+  profile: MemberProfile;
+  categories: LabelCategory[];
+  labels: Label[];
+  selectedLabelIds?: Iterable<string>;
+  action?: string;
+  publicProfileHref?: string;
+}
+
+const {
+  profile,
+  categories,
+  labels,
+  selectedLabelIds = [],
+  action = '/api/profile',
+  publicProfileHref = `/members/${encodeURIComponent(profile.discordUsername)}`,
+} = Astro.props;
+
+const socialFields = [
+  { name: 'website', label: 'Website', placeholder: 'https://yoursite.com' },
+  { name: 'github', label: 'GitHub username', placeholder: 'octocat' },
+  { name: 'linkedin', label: 'LinkedIn username', placeholder: 'yourname' },
+  { name: 'bluesky', label: 'Bluesky handle', placeholder: 'yourname.bsky.social' },
+] as const;
+---
+
+<form method="POST" action={action} class="membership-profile__form">
+  <div class="membership-profile__field membership-profile__field--display-name">
+    <label for="displayName" class="membership-profile__label">Display Name</label>
+    <input id="displayName" name="displayName" type="text" value={profile.displayName} maxlength="100" class="membership-profile__input" />
+  </div>
+
+  <div class="membership-profile__field membership-profile__field--bio">
+    <label for="bio" class="membership-profile__label">About <span class="membership-profile__hint">(Markdown supported · max 1024 characters)</span></label>
+    <textarea id="bio" name="bio" rows="6" maxlength="1024" class="membership-profile__textarea">{profile.bio}</textarea>
+  </div>
+
+  <div class="membership-profile__field membership-profile__field--location">
+    <label for="location" class="membership-profile__label">Location</label>
+    <input id="location" name="location" type="text" value={profile.location} placeholder="e.g. Melbourne, FL" maxlength="100" class="membership-profile__input" />
+  </div>
+
+  <fieldset class="membership-profile__social-links">
+    <legend class="membership-profile__legend">Social Links</legend>
+    <div class="membership-profile__social-link-fields">
+      {socialFields.map(({ name, label, placeholder }) => (
+        <div class="membership-profile__social-link-field">
+          <label for={name} class="membership-profile__label">{label}</label>
+          <input id={name} name={name} type="text" value={profile[name]} placeholder={placeholder} maxlength="200" class="membership-profile__input" />
+        </div>
+      ))}
+    </div>
+  </fieldset>
+
+  <LabelPicker categories={categories} labels={labels} selectedLabelIds={selectedLabelIds} />
+
+  <div class="membership-profile__visibility">
+    <label class="membership-profile__visibility-label">
+      <input type="checkbox" name="isPublic" value="true" checked={profile.isPublic} id="isPublic" class="membership-profile__visibility-input" />
+      <span>Show my profile in the member directory</span>
+    </label>
+  </div>
+
+  <div class="membership-profile__actions">
+    <button type="submit" class="membership-profile__save">Save Profile</button>
+    <a href={publicProfileHref} class="membership-profile__public-link">View public profile →</a>
+  </div>
+</form>
+
+<script>
+  const checkbox = document.getElementById('isPublic') as HTMLInputElement | null;
+  if (checkbox?.form && !checkbox.form.dataset.membershipVisibilityBound) {
+    checkbox.form.dataset.membershipVisibilityBound = 'true';
+    checkbox.form.addEventListener('submit', () => {
+      if (!checkbox.checked) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'isPublic';
+        hidden.value = 'false';
+        checkbox.form?.appendChild(hidden);
+      }
+    });
+  }
+</script>

@@ -1,0 +1,30 @@
+---
+import baseCss from '../styles/base.css?raw';
+import membershipCss from '../styles/membership.css?raw';
+import { enableStyles } from 'astro-discord-membership:config';
+
+interface Props {
+  metadata?: {
+    title?: string;
+    description?: string;
+  };
+}
+
+const { metadata = {} } = Astro.props;
+const title = metadata.title ?? 'Membership';
+const description = metadata.description;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    {description && <meta name="description" content={description} />}
+    <title>{title}</title>
+    {enableStyles && <style is:global set:html={`${baseCss}\n${membershipCss}`} />}
+  </head>
+  <body>
+    <main><slot /></main>
+  </body>
+</html>

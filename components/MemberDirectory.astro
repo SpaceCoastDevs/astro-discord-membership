@@ -1,0 +1,84 @@
+---
+import type { MemberProfile } from '../types';
+import MemberCard from './MemberCard.astro';
+
+export interface MemberDirectoryLabel {
+  name: string;
+  slug: string;
+  categoryName: string;
+  categorySlug: string;
+  categoryTone: number;
+}
+
+interface Props {
+  communityName: string;
+  members: MemberProfile[];
+  labelsByMemberId?: Map<string, MemberDirectoryLabel[]> | Record<string, MemberDirectoryLabel[]>;
+  notice?: { message: string; actionHref?: string; actionText?: string };
+  signInHref?: string;
+  viewer?: { displayName: string; emailVerified: boolean; profileHref?: string; verifyEmailHref?: string };
+}
+
+const {
+  communityName,
+  members,
+  labelsByMemberId = new Map(),
+  notice,
+  signInHref = '/api/auth/login',
+  viewer,
+} = Astro.props;
+const getLabels = (memberId: string) => labelsByMemberId instanceof Map
+  ? labelsByMemberId.get(memberId) ?? []
+  : labelsByMemberId[memberId] ?? [];
+---
+
+<section class="membership-directory">
+  <div class="membership-directory__container">
+    <div class="membership-directory__header">
+      <h1 class="membership-directory__title">Member Directory</h1>
+      <p class="membership-directory__description">Meet the members of the {communityName} community.</p>
+    </div>
+
+    {notice && <div class="membership-directory__notice"><p>{notice.message} {notice.actionHref && <a href={notice.actionHref}>{notice.actionText}</a>}</p></div>}
+
+    <div class="membership-directory__search">
+      <input id="member-search" type="search" placeholder="Search by name or label…" class="membership-directory__search-input" autocomplete="off" />
+    </div>
+
+    {members.length === 0 ? (
+      <p class="membership-directory__empty">No members yet. <a href={signInHref}>Be the first to join!</a></p>
+    ) : (
+      <div id="member-grid" class="membership-directory__grid">
+        {members.map((member) => (
+          <MemberCard
+            discordId={member.discordId}
+            discordUsername={member.discordUsername}
+            displayName={member.displayName}
+            avatarUrl={member.avatarUrl}
+            location={member.location}
+            bio={member.bio}
+            labels={getLabels(member.discordId)}
+          />
+        ))}
+      </div>
+    )}
+
+    {
+      viewer ? (
+        viewer.emailVerified ? (
+          <p class="membership-directory__sign-in">
+            Signed in as <strong>{viewer.displayName}</strong>.{' '}
+            <a href={viewer.profileHref ?? '/profile'} class="membership-directory__sign-in-link">Manage your profile</a>.
+          </p>
+        ) : (
+          <p class="membership-directory__sign-in">
+            Signed in as <strong>{viewer.displayName}</strong>.{' '}
+            <a href={viewer.verifyEmailHref ?? '/verify-email'} class="membership-directory__sign-in-link">Verify your email</a> to activate your profile.
+          </p>
+        )
+      ) : (
+        <p class="membership-directory__sign-in"><a href={signInHref} class="membership-directory__sign-in-link">Sign in with Discord</a> to create your profile and appear in the directory.</p>
+      )
+    }
+  </div>
+</section>

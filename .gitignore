@@ -1,0 +1,10 @@
+.DS_Store
+playground/dist/
+playground/.astro/
+playground/node_modules/
+playground/.env
+.pnpm-store
+playground/membership.db
+playground/membership.db-shm
+playground/membership.db-wal
+node_modules

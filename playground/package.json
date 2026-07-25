@@ -1,0 +1,40 @@
+{
+  "name": "astro-discord-membership-playground",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "e2e:seed": "node ./e2e/setup.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/node": "^8.3.4",
+    "astro": "^4.16.19",
+    "@space-coast-devs/astro-discord-membership": "file:..",
+    "better-sqlite3": "^11.8.1",
+    "drizzle-orm": "^0.44.7",
+    "firebase-admin": "^13.0.0",
+    "jose": "^6.0.0",
+    "marked": "^17.0.0",
+    "nodemailer": "^8.0.0",
+    "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/better-sqlite3": "^7.6.12",
+    "dotenv": "^16.6.1",
+    "drizzle-kit": "^0.31.4"
+  }
+}

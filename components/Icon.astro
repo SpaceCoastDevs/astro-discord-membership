@@ -1,0 +1,40 @@
+---
+interface Props {
+  name: string;
+  class?: string;
+  title?: string;
+}
+
+const { name, class: className, title } = Astro.props;
+
+const icons: Record<string, string> = {
+  'arrow-left': '<path d="M19 12H5m7 7-7-7 7-7" />',
+  'map-pin': '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" />',
+  github:
+    '<path d="M15 22v-3.9c.04-1-.34-1.96-1.06-2.66 3.54-.39 7.26-1.74 7.26-7.9a6.18 6.18 0 0 0-1.65-4.3A5.74 5.74 0 0 0 19.4.55S18.1.16 15 2.22a14.1 14.1 0 0 0-6 0C5.9.16 4.6.55 4.6.55a5.74 5.74 0 0 0-.16 2.69 6.18 6.18 0 0 0-1.65 4.3c0 6.15 3.71 7.5 7.25 7.9A3.65 3.65 0 0 0 9 18.28V22" /><path d="M9 18c-3 .9-3-1.5-4.2-1.8" />',
+  linkedin:
+    '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" />',
+  bluesky:
+    '<path d="M12 11.3C10.7 8.8 7.2 4.5 4 2.2 1 0 .1.5.9 4.2c.6 2.6 2.8 10.8 5.2 13 1.2 1.1 2.5 1.7 3.9 1.7s2.7-.6 3.9-1.7c2.4-2.2 4.6-10.4 5.2-13 .8-3.7-.1-4.2-3.1-2-3.2 2.3-6.7 6.6-8 9.1Z" />',
+  world:
+    '<circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />',
+};
+
+const svg = icons[name] ?? icons.world;
+---
+
+<svg
+  class={className}
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden={title ? undefined : 'true'}
+  role={title ? 'img' : undefined}
+>
+  {title && <title>{title}</title>}
+  <Fragment set:html={svg} />
+</svg>

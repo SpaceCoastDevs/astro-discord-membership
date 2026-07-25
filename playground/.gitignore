@@ -1,0 +1,19 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local credentials
+.env
+
+# logs
+npm-debug.log*
+
+# Playwright's isolated database and artifacts
+e2e-membership.db
+e2e-membership.db-shm
+e2e-membership.db-wal
+test-results/
+playwright-report/

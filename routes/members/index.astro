@@ -1,0 +1,88 @@
+---
+export const prerender = false;
+
+import MembershipLayout from "../../layouts/MembershipLayout.astro";
+import MemberDirectory from '../../components/MemberDirectory.astro';
+import { getSession } from '../../lib/auth';
+import { communityName, database } from "astro-discord-membership:config";
+import { getCategoryToneById } from '../../lib/labels';
+
+const error = Astro.url.searchParams.get("error");
+const viewer = await getSession(Astro.request);
+
+const errorMessages: Record<string, string> = {
+  not_member: `You must be a member of the ${communityName} Discord server to create a profile. Join us first!`,
+  invalid_state:
+    "Something went wrong with the authentication flow. Please try again.",
+  auth_failed: "Authentication failed. Please try again.",
+};
+
+const members = await database.listPublicMemberProfiles();
+const labelCategories = await database.getLabelCategories();
+const labelCategoriesById = new Map(labelCategories.map((category) => [category.id, category]));
+const categoryToneById = getCategoryToneById(labelCategories);
+const labelsById = new Map((await database.getLabels()).map((label) => [label.id, label]));
+const memberLabels = new Map(
+  await Promise.all(
+    members.map(
+      async (member) =>
+        [
+          member.discordId,
+          (await database.getMemberLabelIds(member.discordId))
+            .map((id) => {
+              const label = labelsById.get(id);
+              const category = label && labelCategoriesById.get(label.categoryId);
+              if (!label || !category) return undefined;
+              return {
+                name: label.name,
+                slug: label.slug,
+                categoryName: category.name,
+                categorySlug: category.slug,
+                categoryTone: categoryToneById.get(category.id) ?? 0,
+              };
+            })
+            .filter((label): label is NonNullable<typeof label> => Boolean(label)),
+        ] as const,
+    ),
+  ),
+);
+
+// Sort by displayName
+members.sort((a, b) => a.displayName.localeCompare(b.displayName));
+---
+
+<MembershipLayout
+  metadata={{
+    title: `Member Directory — ${communityName}`,
+    description: `Meet the members of the ${communityName} community.`,
+  }}
+>
+  <MemberDirectory
+    communityName={communityName}
+    members={members}
+    labelsByMemberId={memberLabels}
+    notice={error && errorMessages[error] ? {
+      message: errorMessages[error],
+      ...(error === 'not_member' ? { actionHref: '/discord', actionText: 'Join the Discord' } : {}),
+    } : undefined}
+    viewer={viewer ?? undefined}
+  />
+</MembershipLayout>
+
+<script>
+  function initMemberSearch() {
+    const search = document.getElementById('member-search') as HTMLInputElement | null;
+    const grid = document.getElementById('member-grid');
+    if (!search || !grid || search.dataset.bound) return;
+    search.dataset.bound = 'true';
+    search.addEventListener('input', () => {
+      const query = search.value.toLowerCase().trim();
+      grid.querySelectorAll<HTMLAnchorElement>('a[href^="/members/"]').forEach((card) => {
+        card.style.display = !query || card.dataset.search?.includes(query) ? '' : 'none';
+      });
+    });
+  }
+
+  initMemberSearch();
+  document.addEventListener('astro:page-load', initMemberSearch);
+</script>
